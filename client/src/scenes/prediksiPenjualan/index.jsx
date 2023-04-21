@@ -9,6 +9,7 @@ import {
 	TableRow,
 	Button,
 	Divider,
+	Grid,
 } from '@mui/material';
 import { grey } from '@mui/material/colors';
 import React, { useEffect, useState } from 'react';
@@ -21,7 +22,7 @@ const PrediksiPenjualan = () => {
 	const [message, setMessage] = useState('');
 
 	const { kodeProduk } = useParams();
-	const [daftarPrediksi, setDaftarPrediksi] = useState();
+	const [prediksi, setPrediksi] = useState();
 
 	const getPrediksiPenjualan = async () => {
 		try {
@@ -34,7 +35,7 @@ const PrediksiPenjualan = () => {
 			);
 
 			const data = await response.json();
-			setDaftarPrediksi(data);
+			setPrediksi(data);
 		} catch (error) {
 			setMessage(error.message);
 		}
@@ -82,15 +83,71 @@ const PrediksiPenjualan = () => {
 					</Button>
 				</FlexBetween>
 
-				{daftarPrediksi != null ? (
+				{prediksi != null ? (
 					<>
+						<Grid
+							container
+							sx={{
+								marginTop: '0.5rem',
+							}}
+						>
+							<Grid
+								item
+								xs={4}
+								sx={{
+									paddingY: '0.3rem',
+									paddingX: '0.5rem',
+									backgroundColor: grey[200],
+								}}
+							>
+								<Typography sx={{ textAlign: 'center', fontSize: '1.2rem' }}>
+									(SES) Bobot Alpha :{' '}
+									<Typography variant="span" sx={{ fontWeight: '700' }}>
+										{prediksi.bobotAlpha}
+									</Typography>
+								</Typography>
+							</Grid>
+							<Grid
+								item
+								xs={4}
+								sx={{
+									paddingY: '0.3rem',
+									paddingX: '0.5rem',
+									backgroundColor: grey[200],
+								}}
+							>
+								<Typography sx={{ textAlign: 'center', fontSize: '1.2rem' }}>
+									(LC) Bobot SES :{' '}
+									<Typography variant="span" sx={{ fontWeight: '700' }}>
+										{prediksi.bobotSes}
+									</Typography>
+								</Typography>
+							</Grid>
+							<Grid
+								item
+								xs={4}
+								sx={{
+									paddingY: '0.3rem',
+									paddingX: '0.5rem',
+									backgroundColor: grey[200],
+								}}
+							>
+								<Typography sx={{ textAlign: 'center', fontSize: '1.2rem' }}>
+									(LC) Bobot WMA :{' '}
+									<Typography variant="span" sx={{ fontWeight: '700' }}>
+										{prediksi.bobotWma}
+									</Typography>
+								</Typography>
+							</Grid>
+						</Grid>
+
 						<TableContainer
 							sx={{
-								maxHeight: '80vh',
+								maxHeight: '75vh',
 								backgroundColor: grey[200],
 								padding: '0.6rem',
 
-								marginY: '1rem',
+								marginY: '0.5rem',
 							}}
 						>
 							<Table size="medium" stickyHeader>
@@ -121,30 +178,30 @@ const PrediksiPenjualan = () => {
 								</TableHead>
 
 								<TableBody>
-									{daftarPrediksi.bulanPrediksi.map((bulan, index) => (
+									{prediksi.bulanPrediksi.map((bulan, index) => (
 										<TableRow
-											key={`${daftarPrediksi.tahunPrediksi[index]}${bulan}`}
+											key={`${prediksi.tahunPrediksi[index]}${bulan}`}
 											hover={true}
 										>
 											<TableCell align="center">
-												{daftarPrediksi.tahunPrediksi[index]}
+												{prediksi.tahunPrediksi[index]}
 											</TableCell>
 											<TableCell align="center">{bulan}</TableCell>
 											<TableCell align="center">
-												{daftarPrediksi.penjualanAktual[index]}
+												{prediksi.penjualanAktual[index]}
 											</TableCell>
 											<TableCell align="center">
-												{daftarPrediksi.wmaPrediksi[index].toFixed(2)}
+												{prediksi.wmaPrediksi[index].toFixed(2)}
 											</TableCell>
 											<TableCell align="center">
-												{daftarPrediksi.sesPrediksi[index].toFixed(2)}
+												{prediksi.sesPrediksi[index].toFixed(2)}
 											</TableCell>
 											<TableCell align="center">
-												{daftarPrediksi.hybridPrediksi[index].toFixed(2)}
+												{prediksi.lcPrediksi[index].toFixed(2)}
 											</TableCell>
 											<TableCell align="center">
-												{daftarPrediksi.mapePrediksi[index] !== undefined
-													? daftarPrediksi.mapePrediksi[index].toFixed(2)
+												{prediksi.mapePrediksi[index] !== undefined
+													? prediksi.mapePrediksi[index].toFixed(2)
 													: null}
 											</TableCell>
 										</TableRow>
@@ -158,36 +215,36 @@ const PrediksiPenjualan = () => {
 										</TableCell>
 										<TableCell align="center">
 											<Typography fontWeight={500} fontSize="1.1rem">
-												{daftarPrediksi.rataRata.penjualanAktual
-													? daftarPrediksi.rataRata.penjualanAktual.toFixed(2)
+												{prediksi.rataRata.penjualanAktual
+													? prediksi.rataRata.penjualanAktual.toFixed(2)
 													: '0'}
 											</Typography>
 										</TableCell>
 										<TableCell align="center">
 											<Typography fontWeight={500} fontSize="1.1rem">
-												{daftarPrediksi.rataRata.wmaPrediksi
-													? daftarPrediksi.rataRata.wmaPrediksi.toFixed(2)
+												{prediksi.rataRata.wmaPrediksi
+													? prediksi.rataRata.wmaPrediksi.toFixed(2)
 													: '0'}
 											</Typography>
 										</TableCell>
 										<TableCell align="center">
 											<Typography fontWeight={500} fontSize="1.1rem">
-												{daftarPrediksi.rataRata.sesPrediksi
-													? daftarPrediksi.rataRata.sesPrediksi.toFixed(2)
+												{prediksi.rataRata.sesPrediksi
+													? prediksi.rataRata.sesPrediksi.toFixed(2)
 													: '0'}
 											</Typography>
 										</TableCell>
 										<TableCell align="center">
 											<Typography fontWeight={500} fontSize="1.1rem">
-												{daftarPrediksi.rataRata.hybridPrediksi
-													? daftarPrediksi.rataRata.hybridPrediksi.toFixed(2)
+												{prediksi.rataRata.lcPrediksi
+													? prediksi.rataRata.lcPrediksi.toFixed(2)
 													: '0'}
 											</Typography>
 										</TableCell>
 										<TableCell align="center">
 											<Typography fontWeight={500} fontSize="1.1rem">
-												{daftarPrediksi.rataRata.mapePrediksi
-													? daftarPrediksi.rataRata.mapePrediksi.toFixed(2)
+												{prediksi.rataRata.mapePrediksi
+													? prediksi.rataRata.mapePrediksi.toFixed(2)
 													: '0'}
 											</Typography>
 										</TableCell>
@@ -195,7 +252,6 @@ const PrediksiPenjualan = () => {
 								</TableBody>
 							</Table>
 						</TableContainer>
-
 						<Box
 							sx={{
 								bgcolor: 'grey.200',

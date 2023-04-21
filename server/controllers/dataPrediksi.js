@@ -1,11 +1,12 @@
 import { connection } from '../javascripts/mysql.js';
 
-const menghitungSES = (dataAktual0, dataPrediksi0) => {
-	const alpha = 0.5;
-	const hasilSES = dataAktual0 * alpha + (1 - alpha) * dataPrediksi0;
+// Nilai alpha antara 0,1 sampai 0,9
+const menghitungSES = (alpha, dataAktual, dataPrediksi) => {
+	const hasilSES = dataAktual * alpha + (1 - alpha) * dataPrediksi;
 	return hasilSES;
 };
 
+// Data Aktual 0 > Data Aktual 1 > Data Aktual 2
 const menghitungWMA = (dataAktual0, dataAktual1, dataAktual2) => {
 	const bobot = [3, 2, 1];
 
@@ -16,20 +17,25 @@ const menghitungWMA = (dataAktual0, dataAktual1, dataAktual2) => {
 	return WMA;
 };
 
-const menghitungLinearCombination = (hasilSES, hasilWMA) => {
-	const bobotSES = 0.5;
-	const bobotWMA = 1 - bobotSES;
+// Bobot Linear Combination antara 0,1 sampai 0,9
+const menghitungLinearCombination = (bobot, hasilSES, hasilWMA) => {
+	const bobotSES = bobot;
+	const bobotWMA = 1 - bobot;
 
 	const hasilLinearCombination = hasilSES * bobotSES + hasilWMA * bobotWMA;
 
 	return hasilLinearCombination;
 };
 
+// Menghitung rata - rata dari array
+const average = (arr) => arr.reduce((acc, val) => acc + val, 0) / arr.length;
+
 export const getPrediksiPenjualan = async (req, res) => {
 	try {
 		const { kodeProduk } = req.params;
+		const bobot = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9];
 
-		const [row_aktual] = await connection.execute(
+		const [rows] = await connection.execute(
 			`SELECT * FROM penjualan WHERE kodeProduk = ? ORDER BY tahun ASC, bulan ASC`,
 			[kodeProduk]
 		);
@@ -38,40 +44,23 @@ export const getPrediksiPenjualan = async (req, res) => {
 		let bulanAktual = [];
 		let penjualanAktual = [];
 
-		for (let x in row_aktual) {
-			tahunAktual.push(row_aktual[x].tahun);
-			bulanAktual.push(row_aktual[x].bulan);
-			penjualanAktual.push(row_aktual[x].penjualan);
+		// Memindahkan data yang diterima dari database kedalam variabel
+		for (let x in rows) {
+			tahunAktual.push(rows[x].tahun);
+			bulanAktual.push(rows[x].bulan);
+			penjualanAktual.push(rows[x].penjualan);
 		}
 
-		let tahunPrediksi = [];
-		let bulanPrediksi = [];
+		// Mempersiapkan data - data prediksi
+		let tahunPrediksi = tahunAktual;
+		let bulanPrediksi = bulanAktual;
 		let wmaPrediksi = [];
 		let sesPrediksi = [];
-		let hybridPrediksi = [];
+		let lcPrediksi = [];
 		let mapePrediksi = [];
 
-		tahunPrediksi[0] = tahunAktual[0];
-		bulanPrediksi[0] = bulanAktual[0];
-		sesPrediksi[0] = penjualanAktual[0];
-		wmaPrediksi[0] = 0;
-
-		//menghitung ses
-		for (let x in row_aktual) {
-			if (
-				penjualanAktual[x - 1] != undefined &&
-				sesPrediksi[x - 1] != undefined
-			) {
-				const ses = menghitungSES(penjualanAktual[x - 1], sesPrediksi[x - 1]);
-
-				tahunPrediksi[x] = tahunAktual[x];
-				bulanPrediksi[x] = bulanAktual[x];
-				sesPrediksi[x] = ses;
-			}
-		}
-
-		// menghitung wma
-		for (let x in row_aktual) {
+		// Menghitung WMA
+		for (let x in penjualanAktual) {
 			if (
 				penjualanAktual[x - 1] != undefined &&
 				penjualanAktual[x - 2] != undefined &&
@@ -88,7 +77,107 @@ export const getPrediksiPenjualan = async (req, res) => {
 			}
 		}
 
-		// bulan tahun prediksi baru
+		// Menghitung SES & Sekaligus mencari bobot alpha yang paling cocok.
+		let averageMapeSes;
+		let bobotAlpha;
+
+		for (let z in bobot) {
+			let sesTemp = [];
+			let mapeSes = [];
+			sesTemp[0] = penjualanAktual[0];
+
+			let alpha = bobot[z];
+
+			for (let x in penjualanAktual) {
+				if (
+					penjualanAktual[x - 1] != undefined &&
+					sesTemp[x - 1] != undefined
+				) {
+					const ses = menghitungSES(
+						alpha,
+						penjualanAktual[x - 1],
+						sesTemp[x - 1]
+					);
+					sesTemp[x] = ses;
+				}
+			}
+
+			// Menghitung mape setiap prediksi ses
+			for (let x in sesTemp) {
+				if (penjualanAktual[x] === 0) {
+					mapeSes[x] = 0;
+				} else {
+					mapeSes[x] = Math.abs(
+						((penjualanAktual[x] - sesTemp[x]) / penjualanAktual[x]) * 100
+					);
+				}
+			}
+
+			if (averageMapeSes === undefined && bobotAlpha === undefined) {
+				averageMapeSes = average(mapeSes);
+				bobotAlpha = alpha;
+				sesPrediksi = sesTemp;
+			}
+
+			if (averageMapeSes > average(mapeSes)) {
+				averageMapeSes = average(mapeSes);
+				bobotAlpha = alpha;
+				sesPrediksi = sesTemp;
+			}
+		}
+
+		// Menghitung Linear Combination & Mencari bobot terbaik
+		let averageMapeLc;
+		let bobotSes;
+		let bobotWma;
+
+		for (let z in bobot) {
+			let lcTemp = [];
+			let mapeLc = [];
+
+			let bobotSesTemp = bobot[z];
+
+			for (let x in penjualanAktual) {
+				if (wmaPrediksi[x] === 0) {
+					lcTemp[x] = 0;
+				} else {
+					lcTemp[x] = menghitungLinearCombination(
+						bobotSesTemp,
+						sesPrediksi[x],
+						wmaPrediksi[x]
+					);
+				}
+			}
+
+			// Menghitung mape setiap prediksi LC
+			for (let x in lcTemp) {
+				if (wmaPrediksi[x] == 0) {
+					mapeLc[x] = 0;
+				} else {
+					mapeLc[x] = Math.abs(
+						((penjualanAktual[x] - lcTemp[x]) / penjualanAktual[x]) * 100
+					);
+				}
+			}
+
+			if (averageMapeLc === undefined && bobotSes === undefined) {
+				averageMapeLc = average(mapeLc);
+				bobotSes = bobotSesTemp;
+				bobotWma = 1 - bobotSes;
+				lcPrediksi = lcTemp;
+				mapePrediksi = mapeLc;
+			}
+
+			if (averageMapeLc > average(mapeLc)) {
+				averageMapeLc = average(mapeLc);
+				bobotSes = bobotSesTemp;
+				bobotWma = Number((1 - bobotSes).toFixed(1));
+				lcPrediksi = lcTemp;
+				mapePrediksi = mapeLc;
+			}
+		}
+
+		// Bulan & Tahun Prediksi
 		tahunPrediksi[tahunPrediksi.length] =
 			bulanPrediksi.length == 12
 				? tahunPrediksi[tahunPrediksi.length - 1] + 1
@@ -99,71 +188,56 @@ export const getPrediksiPenjualan = async (req, res) => {
 				? 1
 				: bulanPrediksi[bulanPrediksi.length - 1] + 1;
 
-		// prediksi WMA baru
+		// Prediksi WMA baru
 		wmaPrediksi[wmaPrediksi.length] = menghitungWMA(
-			penjualanAktual[sesPrediksi.length - 1],
-			penjualanAktual[sesPrediksi.length - 2],
-			penjualanAktual[sesPrediksi.length - 3]
+			penjualanAktual[wmaPrediksi.length - 1],
+			penjualanAktual[wmaPrediksi.length - 2],
+			penjualanAktual[wmaPrediksi.length - 3]
 		);
 
-		// prediksi SES baru
+		// Prediksi SES baru
 		sesPrediksi[sesPrediksi.length] = menghitungSES(
+			bobotAlpha,
 			parseFloat(penjualanAktual[sesPrediksi.length - 1]),
 			parseFloat(sesPrediksi[sesPrediksi.length - 1])
 		);
 
-		// menghitung linear combination
-		for (let x in wmaPrediksi) {
-			if (wmaPrediksi[x] !== 0) {
-				hybridPrediksi.push(
-					menghitungLinearCombination(wmaPrediksi[x], sesPrediksi[x])
-				);
-			} else {
-				hybridPrediksi.push(0);
-			}
-		}
+		// Prediksi Linear Combination baru
+		lcPrediksi[lcPrediksi.length] = menghitungLinearCombination(
+			bobotSes,
+			sesPrediksi[lcPrediksi.length],
+			wmaPrediksi[lcPrediksi.length]
+		);
 
-		// menghitung MAPE
-		for (let x in penjualanAktual) {
-			if (wmaPrediksi[x] !== 0) {
-				mapePrediksi[x] =
-					((penjualanAktual[x] - hybridPrediksi[x]) / penjualanAktual[x]) * 100;
-			} else {
-				mapePrediksi[x] = 0;
-			}
-		}
-
-		// menghitung rata rata
+		// Menghitung rata rata
 		const rataRata = {
 			penjualanAktual: 0,
 			wmaPrediksi: 0,
 			sesPrediksi: 0,
-			hybridPrediksi: 0,
+			lcPrediksi: 0,
 			mapePrediksi: 0,
 		};
-
-		const average = (arr) =>
-			arr.reduce((acc, val) => acc + val, 0) / arr.length;
 
 		rataRata.penjualanAktual = average(penjualanAktual);
 		rataRata.wmaPrediksi = average(wmaPrediksi.slice(3, -1));
 		rataRata.sesPrediksi = average(sesPrediksi.slice(3, -1));
-		rataRata.hybridPrediksi = average(hybridPrediksi.slice(3, -1));
+		rataRata.lcPrediksi = average(lcPrediksi.slice(3, -1));
 		rataRata.mapePrediksi = average(mapePrediksi.slice(3));
 
 		res.status(200).json({
-			// tahunAktual,
-			// bulanAktual,
 			tahunPrediksi,
 			bulanPrediksi,
 			penjualanAktual,
 			wmaPrediksi,
+			bobotAlpha,
 			sesPrediksi,
-			hybridPrediksi,
+			bobotSes,
+			bobotWma,
+			lcPrediksi,
 			mapePrediksi,
 			rataRata,
 		});
 	} catch (error) {
-		res.status(404).json({ message: error.message });
+		res.status(404).json({ error: error.message });
 	}
 };
