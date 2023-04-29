@@ -60,30 +60,54 @@ app.post(
 
 			// Ambil data dari file Excel atau CSV
 			const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-			const data = XLSX.utils.sheet_to_json(worksheet);
+			const temp = XLSX.utils.sheet_to_json(worksheet);
+			const data = temp.map((item) => {
+				const newItem = {};
+				for (const key in item) {
+					newItem[key.toLowerCase()] = item[key];
+				}
+				return newItem;
+			});
+
+			// Cek apakah file memiliki header yang dibutuhkan
+			const requiredHeaders = ['tahun', 'bulan', 'penjualan'];
+			const fileHeaders = Object.keys(data[0]).map((header) =>
+				header.toLowerCase()
+			);
+			const extraHeaders = fileHeaders.filter(
+				(header) => !requiredHeaders.includes(header)
+			);
+
+			if (extraHeaders.length > 0) {
+				throw new Error(
+					`File memiliki kolom header yang tidak dibutuhkan: ${extraHeaders.join(
+						', '
+					)}`
+				);
+			}
+
+			if (!requiredHeaders.every((header) => fileHeaders.includes(header))) {
+				throw new Error('File tidak memiliki kolom header yang dibutuhkan.');
+			}
 
 			for (let i = 0; i < data.length; i++) {
-				const { TAHUN, BULAN, PENJUALAN } = data[i];
-
-				const tahun = TAHUN;
-				const bulan = BULAN;
-				const penjualan = PENJUALAN;
+				const { tahun, bulan, penjualan } = data[i];
 				const kodePenjualan = `${kodeProduk}${tahun}${bulan}`;
 
+				// Simpan data penjualan ke dalam tabel 'penjualan'
 				await connection.execute(
 					`INSERT INTO penjualan (kodePenjualan, kodeProduk, tahun, bulan, penjualan)
-				VALUES (?, ?, ?, ?, ?)`,
+          VALUES (?, ?, ?, ?, ?)`,
 					[kodePenjualan, kodeProduk, tahun, bulan, penjualan]
 				);
 
+				// Perbarui jumlah penjualan total di tabel 'produk'
 				const [row] = await connection.execute(
 					'SELECT totalPenjualan FROM produk WHERE kodeProduk = ?',
 					[kodeProduk]
 				);
-
 				const totalPenjualanBaru =
 					parseInt(row[0].totalPenjualan) + parseInt(penjualan);
-
 				await connection.execute(
 					'UPDATE produk SET totalPenjualan = ? WHERE kodeProduk = ?',
 					[totalPenjualanBaru, kodeProduk]

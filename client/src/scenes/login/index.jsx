@@ -7,6 +7,7 @@ const Login = () => {
 	const [password, setPassword] = useState('');
 
 	const [message, setMessage] = useState('');
+	const [success, setSuccess] = useState('');
 
 	const handleLogin = async (event) => {
 		event.preventDefault();
@@ -24,6 +25,7 @@ const Login = () => {
 
 			if (data.token && data.status) {
 				localStorage.setItem('token', data.token);
+				localStorage.setItem('success', data.success);
 				localStorage.setItem('message', data.message);
 				localStorage.setItem('status', data.status);
 				window.location.href = '/';
@@ -31,10 +33,12 @@ const Login = () => {
 
 			if (!data.token) {
 				// localStorage.setItem('error', data.error);
+				setSuccess(data.success);
 				setMessage(data.message);
 				// window.location.href = '/login';
 			}
 		} catch (error) {
+			setSuccess('error');
 			setMessage(error.message);
 		}
 	};
@@ -54,13 +58,13 @@ const Login = () => {
 				<Box
 					sx={{
 						width: '100%',
-						border: '2px solid #f48fb1',
+						border: `2px solid ${success === 'ok' ? '#a5d6a7' : '#f48fb1'}`,
 						borderRadius: '5px',
 						paddingX: '0.8rem',
 						paddingY: '1rem',
 						marginBottom: '1rem',
 
-						bgcolor: '#f8bbd0',
+						bgcolor: `${success === 'ok' ? '#c8e6c9' : '#f8bbd0'}`,
 					}}
 				>
 					<Typography variant="h6" fontWeight="500" color="grey.800">

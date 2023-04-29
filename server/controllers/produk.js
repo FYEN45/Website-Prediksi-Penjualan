@@ -10,13 +10,17 @@ export const getProduk = async (req, res) => {
 		);
 
 		if (rows.length === 0) {
-			return res.status(404).json({ message: 'Produk tidak ditemukan' });
+			return res
+				.status(404)
+				.json({ success: 'error', message: 'Produk tidak ditemukan' });
 		}
 
 		res.status(200).json(rows[0]);
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ message: 'Terjadi kesalahan pada server' });
+		res
+			.status(500)
+			.json({ success: 'error', message: 'Terjadi kesalahan pada server' });
 	}
 };
 
@@ -27,7 +31,9 @@ export const getDaftarProduk = async (req, res) => {
 		res.status(200).json(rows);
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ message: 'Terjadi kesalahan pada server' });
+		res
+			.status(500)
+			.json({ success: 'error', message: 'Terjadi kesalahan pada server' });
 	}
 };
 
@@ -40,10 +46,10 @@ export const postTambahProduk = async (req, res) => {
 			[kodeProduk, namaProduk, jenisProduk, totalPenjualan]
 		);
 
-		res.status(200).json({ message: 'Input Produk Sukses' });
+		res.status(200).json({ success: 'ok', message: 'Input Produk Sukses' });
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ message: error.message });
+		res.status(500).json({ success: 'error', message: error.message });
 	}
 };
 
@@ -52,7 +58,9 @@ export const postEditProduk = async (req, res) => {
 		const { kodeProduk, namaProduk, jenisProduk, totalPenjualan } = req.body;
 
 		if (!kodeProduk || !namaProduk || !jenisProduk || !totalPenjualan) {
-			return res.status(400).json({ message: 'Data tidak lengkap' });
+			return res
+				.status(400)
+				.json({ success: 'error', message: 'Data tidak lengkap' });
 		}
 
 		await connection.execute(
@@ -60,10 +68,10 @@ export const postEditProduk = async (req, res) => {
 			[namaProduk, jenisProduk, totalPenjualan, kodeProduk]
 		);
 
-		res.status(200).json({ message: 'Ubah Produk Sukses' });
+		res.status(200).json({ success: 'ok', message: 'Ubah Produk Sukses' });
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ message: error.message });
+		res.status(500).json({ success: 'error', message: error.message });
 	}
 };
 
@@ -75,8 +83,8 @@ export const postHapusProduk = async (req, res) => {
 			kodeProduk,
 		]);
 
-		res.status(200).json({ message: 'Hapus Produk Sukses' });
+		res.status(200).json({ success: 'ok', message: 'Hapus Produk Sukses' });
 	} catch (error) {
-		res.status(404).json({ message: error.message });
+		res.status(404).json({ success: 'error', message: error.message });
 	}
 };

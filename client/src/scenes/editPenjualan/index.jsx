@@ -5,7 +5,9 @@ import { Box, Typography, Button, TextField } from '@mui/material';
 
 const EditPenjualan = () => {
 	const token = localStorage.getItem('token');
+
 	const [message, setMessage] = useState('');
+	const [success, setSuccess] = useState('');
 
 	const navigate = useNavigate();
 
@@ -32,6 +34,7 @@ const EditPenjualan = () => {
 			setBulan(data.bulan);
 			setPenjualan(data.penjualan);
 		} catch (error) {
+			setSuccess('error');
 			setMessage(error.message);
 		}
 	};
@@ -47,10 +50,13 @@ const EditPenjualan = () => {
 				body: JSON.stringify(data),
 			});
 
-			const { message } = await response.json();
+			const { success, message } = await response.json();
 			localStorage.setItem('message', message);
+			localStorage.setItem('success', success);
+
 			window.location.href = `/produk/penjualan/${kodeProduk}`;
 		} catch (error) {
+			setSuccess('error');
 			setMessage(error.message);
 		}
 	};
@@ -69,13 +75,13 @@ const EditPenjualan = () => {
 				<Box
 					sx={{
 						width: '100%',
-						border: '2px solid #f48fb1',
+						border: `2px solid ${success === 'ok' ? '#a5d6a7' : '#f48fb1'}`,
 						borderRadius: '5px',
 						paddingX: '0.8rem',
 						paddingY: '1rem',
 						marginBottom: '1rem',
 
-						bgcolor: '#f8bbd0',
+						bgcolor: `${success === 'ok' ? '#c8e6c9' : '#f8bbd0'}`,
 					}}
 				>
 					<Typography variant="h6" fontWeight="500" color="grey.800">

@@ -18,12 +18,18 @@ export const postUserLogin = async (req, res) => {
 		if (row[0].password === password) {
 			const token = jwt.sign({ username, status }, SECRET_TOKEN);
 
-			res.status(200).json({ message: 'Berhasil Login', token, status });
+			res
+				.status(200)
+				.json({ success: 'ok', message: 'Berhasil Login', token, status });
 		} else {
-			res.status(400).json({ message: 'Username / Password salah' });
+			res
+				.status(400)
+				.json({ success: 'error', message: 'Username / Password salah' });
 		}
 	} else {
-		res.status(400).json({ message: 'Username tidak ditemukan' });
+		res
+			.status(400)
+			.json({ success: 'error', message: 'Username tidak ditemukan' });
 	}
 };
 
@@ -37,13 +43,17 @@ export const getDataUser = async (req, res) => {
 		);
 
 		if (rows.length === 0) {
-			return res.status(404).json({ message: 'Produk tidak ditemukan' });
+			return res
+				.status(404)
+				.json({ success: 'error', message: 'User tidak ditemukan' });
 		}
 
 		res.status(200).json(rows[0]);
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ message: 'Terjadi kesalahan pada server' });
+		res
+			.status(500)
+			.json({ success: 'error', message: 'Terjadi kesalahan pada server' });
 	}
 };
 
@@ -56,7 +66,9 @@ export const getDaftarUser = async (req, res) => {
 		res.status(200).json(rows);
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ message: 'Terjadi kesalahan pada server' });
+		res
+			.status(500)
+			.json({ success: 'error', message: 'Terjadi kesalahan pada server' });
 	}
 };
 
@@ -69,10 +81,10 @@ export const postTambahUser = async (req, res) => {
 			[username, nama, noTelepon, alamat, status, password]
 		);
 
-		res.status(200).json({ message: 'Input User Sukses' });
+		res.status(200).json({ success: 'ok', message: 'Input User Sukses' });
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ message: error.message });
+		res.status(500).json({ success: 'error', message: error.message });
 	}
 };
 
@@ -85,10 +97,10 @@ export const postEditUser = async (req, res) => {
 			[nama, noTelepon, alamat, status, password, username]
 		);
 
-		res.status(200).json({ message: 'Ubah User Sukses' });
+		res.status(200).json({ success: 'ok', message: 'Ubah User Sukses' });
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ message: error.message });
+		res.status(500).json({ success: 'error', message: error.message });
 	}
 };
 
@@ -98,9 +110,9 @@ export const postHapusUser = async (req, res) => {
 
 		await connection.execute('DELETE FROM user WHERE username=?', [username]);
 
-		res.status(200).json({ message: 'Hapus User Sukses' });
+		res.status(200).json({ success: 'ok', message: 'Hapus User Sukses' });
 	} catch (error) {
-		res.status(404).json({ message: error.message });
+		res.status(404).json({ success: 'error', message: error.message });
 	}
 };
 
@@ -113,6 +125,8 @@ export const getUserLog = async (req, res) => {
 		res.status(200).json(rows);
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ message: 'Terjadi kesalahan pada server' });
+		res
+			.status(500)
+			.json({ success: 'error', message: 'Terjadi kesalahan pada server' });
 	}
 };

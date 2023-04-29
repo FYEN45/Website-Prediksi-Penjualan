@@ -7,7 +7,7 @@ export const getDaftarPenjualan = async (req, res) => {
 		res.status(200).json(rows);
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ message: error.message });
+		res.status(500).json({ status: 'error', message: error.message });
 	}
 };
 
@@ -23,7 +23,7 @@ export const getDaftarPenjualanProduk = async (req, res) => {
 		res.status(200).json(rows);
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ message: error.message });
+		res.status(500).json({ success: 'error', message: error.message });
 	}
 };
 
@@ -39,13 +39,13 @@ export const getDataPenjualanProduk = async (req, res) => {
 		if (row.length === 0) {
 			return res
 				.status(404)
-				.json({ message: 'Data penjualan tidak ditemukan' });
+				.json({ success: 'error', message: 'Data penjualan tidak ditemukan' });
 		}
 
 		res.status(200).json(row[0]);
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ message: error.message });
+		res.status(500).json({ success: 'error', message: error.message });
 	}
 };
 
@@ -72,10 +72,10 @@ export const postTambahPenjualan = async (req, res) => {
 			[totalPenjualanBaru, kodeProduk]
 		);
 
-		res.status(200).json({ message: 'Input Penjualan Sukses' });
+		res.status(200).json({ success: 'ok', message: 'Input Penjualan Sukses' });
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ message: error.message });
+		res.status(500).json({ success: 'error', message: error.message });
 	}
 };
 
@@ -84,7 +84,9 @@ export const postEditPenjualan = async (req, res) => {
 		const { kodePenjualan, kodeProduk, tahun, bulan, penjualan } = req.body;
 
 		if (!kodePenjualan || !kodeProduk || !tahun || !bulan || !penjualan) {
-			return res.status(400).json({ error: 'Data tidak lengkap' });
+			return res
+				.status(400)
+				.json({ success: 'error', error: 'Data tidak lengkap' });
 		}
 
 		const result = await connection.execute(
@@ -93,13 +95,15 @@ export const postEditPenjualan = async (req, res) => {
 		);
 
 		if (result.affectedRows === 0) {
-			return res.status(404).json({ message: 'Transaksi tidak ditemukan' });
+			return res
+				.status(404)
+				.json({ success: 'error', message: 'Transaksi tidak ditemukan' });
 		}
 
-		res.status(200).json({ message: 'Ubah Penjualan Sukses' });
+		res.status(200).json({ success: 'ok', message: 'Ubah Penjualan Sukses' });
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ message: error.message });
+		res.status(500).json({ success: 'error', message: error.message });
 	}
 };
 
@@ -115,7 +119,7 @@ export const postHapusPenjualan = async (req, res) => {
 		if (rowTransaksi.length === 0) {
 			return res
 				.status(404)
-				.json({ message: 'Data Transaksi tidak ditemukan' });
+				.json({ success: 'error', message: 'Data Transaksi tidak ditemukan' });
 		}
 
 		const kodeProduk = rowTransaksi[0].kodeProduk;
@@ -138,9 +142,11 @@ export const postHapusPenjualan = async (req, res) => {
 			kodePenjualan,
 		]);
 
-		res.status(200).json({ message: 'Hapus Penjualan Sukses' });
+		res.status(200).json({ success: 'ok', message: 'Hapus Penjualan Sukses' });
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ message: 'Internal server error' });
+		res
+			.status(500)
+			.json({ success: 'error', message: 'Internal server error' });
 	}
 };
