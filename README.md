@@ -8,7 +8,7 @@
 
 ## Tampilan Website
 
-![Home](/../pictures/HOME.png)
+![Home](pictures/HOME.png)
 
 Website ini dibuat menggunakan teknologi :
 
