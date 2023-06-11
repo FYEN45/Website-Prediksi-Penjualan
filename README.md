@@ -23,17 +23,25 @@ Website ini dibuat menggunakan teknologi :
 
 ![Daftar Produk](pictures/DAFTAR%20PRODUK.png)
 
-## Halaman Tambah / Edit Produk
+## Halaman Tambah Produk
 
-![Tambah Produk](pictures/TAMBAH%20PRODUK.png) ![Edit Produk](pictures/EDIT%20PRODUK.png)
+![Tambah Produk](pictures/TAMBAH%20PRODUK.png)
+
+## Halaman Edit Produk
+
+![Edit Produk](pictures/EDIT%20PRODUK.png)
 
 ## Halaman Daftar Penjualan
 
 ![Daftar Penjualan](pictures/DAFTAR%20PENJUALAN.png)
 
-## Halaman Tambah / Edit Penjualan
+## Halaman Tambah Penjualan
 
-![Tambah Penjualan](pictures/TAMBAH%20PENJUALAN.png) ![Edit Penjualan](pictures/EDIT%20PENJUALAN.png)
+![Tambah Penjualan](pictures/TAMBAH%20PENJUALAN.png)
+
+## Halaman Edit Penjualan
+
+![Edit Penjualan](pictures/EDIT%20PENJUALAN.png)
 
 ## Halaman Prediksi
 
@@ -43,9 +51,13 @@ Website ini dibuat menggunakan teknologi :
 
 ![Daftar User](pictures/DAFTAR%20USER.png)
 
-## Halaman Tambah / Edit User
+## Halaman Tambah User
 
-![Tambah User](pictures/TAMBAH%20USER.png) ![Edit User](pictures/EDIT%20USER.png)
+![Tambah User](pictures/TAMBAH%20USER.png)
+
+## Halaman Edit User
+
+![Edit User](pictures/EDIT%20USER.png)
 
 ## Halaman User Log
 
