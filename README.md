@@ -9,6 +9,8 @@
 Website ini dibuat menggunakan teknologi :
 **_React, Material UI, NodeJS, Express, MySQL_**
 
+Link Youtube : [Website Prediksi Penjualan](https://youtu.be/PoilXdXh92U)
+
 # Tampilan Website
 
 ## Halaman Home
