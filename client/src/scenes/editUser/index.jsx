@@ -170,7 +170,7 @@ const EditUser = () => {
 						onChange={(e) => setStatus(e.target.value)}
 					/>
 
-					<TextField
+					{/* <TextField
 						fullWidth
 						required
 						margin="dense"
@@ -179,7 +179,7 @@ const EditUser = () => {
 						variant="outlined"
 						value={password}
 						onChange={(e) => setPassword(e.target.value)}
-					/>
+					/> */}
 
 					<Box
 						sx={{

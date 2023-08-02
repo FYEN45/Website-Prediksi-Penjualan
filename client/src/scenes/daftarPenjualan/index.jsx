@@ -147,6 +147,7 @@ const DaftarPenjualan = () => {
 		<BasePage
 			sx={{
 				paddingTop: '1rem',
+				marginBottom: '1rem',
 			}}
 		>
 			<Box>

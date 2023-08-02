@@ -157,6 +157,7 @@ const TambahUser = () => {
 						margin="dense"
 						id="password"
 						label="Password"
+						type="password"
 						variant="outlined"
 						error={passwordError}
 						onChange={(e) => setPassword(e.target.value)}
