@@ -86,6 +86,7 @@ const DaftarProduk = () => {
 		<BasePage
 			sx={{
 				paddingTop: '1rem',
+				marginBottom: '1rem',
 			}}
 		>
 			{message ? (
