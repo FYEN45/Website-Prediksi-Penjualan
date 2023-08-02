@@ -37,7 +37,7 @@ const DeleteConfirmation = (props) => {
 				color="error"
 				onClick={handleClickOpen}
 			>
-				Delete
+				Hapus
 			</Button>
 
 			<Dialog
