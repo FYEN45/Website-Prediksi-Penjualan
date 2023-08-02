@@ -15,6 +15,7 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import BasePage from '../../components/BasePage';
 import FlexBetween from '../../components/FlexBetween';
+import DeleteConfirmation from '../../components/DeleteConfirmation';
 
 const DaftarUser = () => {
 	const token = localStorage.getItem('token');
@@ -42,8 +43,8 @@ const DaftarUser = () => {
 		}
 	};
 
-	const handleHapus = async (e, username) => {
-		e.preventDefault();
+	const handleHapus = async (username) => {
+		// e.preventDefault();
 		const data = { username };
 
 		try {
@@ -179,22 +180,35 @@ const DaftarUser = () => {
 											</TableCell>
 											<TableCell align="center">{status}</TableCell>
 											<TableCell align="center">
-												<Button
-													href={`/user/edit/${username}`}
-													variant="contained"
-													size="small"
-													sx={{ marginRight: '0.4rem' }}
+												<Box
+													sx={{
+														display: 'flex',
+														justifyContent: 'center',
+													}}
 												>
-													Edit
-												</Button>
-												<Button
+													<Button
+														href={`/user/edit/${username}`}
+														variant="contained"
+														size="small"
+														sx={{ marginRight: '0.4rem' }}
+													>
+														Edit
+													</Button>
+
+													{/* <Button
 													variant="contained"
 													size="small"
 													color="error"
 													onClick={(e) => handleHapus(e, username)}
 												>
 													Hapus
-												</Button>
+												</Button> */}
+
+													<DeleteConfirmation
+														nama={`User ${username}`}
+														onDelete={() => handleHapus(username)}
+													/>
+												</Box>
 											</TableCell>
 										</TableRow>
 									)

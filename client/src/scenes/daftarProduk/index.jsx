@@ -15,6 +15,7 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import BasePage from '../../components/BasePage';
 import FlexBetween from '../../components/FlexBetween';
+import DeleteConfirmation from '../../components/DeleteConfirmation';
 
 const DaftarProduk = () => {
 	const token = localStorage.getItem('token');
@@ -43,8 +44,8 @@ const DaftarProduk = () => {
 		}
 	};
 
-	const handleHapus = async (e, kodeProduk) => {
-		e.preventDefault();
+	const handleHapus = async (kodeProduk) => {
+		// e.preventDefault();
 		const data = { kodeProduk };
 
 		try {
@@ -198,14 +199,20 @@ const DaftarProduk = () => {
 															>
 																Edit
 															</Button>
-															<Button
+
+															{/* <Button
 																variant="contained"
 																size="small"
 																color="error"
 																onClick={(e) => handleHapus(e, kodeProduk)}
 															>
 																Hapus
-															</Button>
+															</Button> */}
+
+															<DeleteConfirmation
+																nama={`Produk ${namaProduk}`}
+																onDelete={() => handleHapus(kodeProduk)}
+															/>
 														</>
 													) : null}
 												</Box>

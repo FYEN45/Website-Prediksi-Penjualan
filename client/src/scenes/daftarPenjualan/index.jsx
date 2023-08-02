@@ -18,6 +18,7 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import BasePage from '../../components/BasePage';
 import FlexBetween from '../../components/FlexBetween';
+import DeleteConfirmation from '../../components/DeleteConfirmation';
 
 const DaftarPenjualan = () => {
 	const token = localStorage.getItem('token');
@@ -51,8 +52,8 @@ const DaftarPenjualan = () => {
 		}
 	};
 
-	const handleHapus = async (e, kodePenjualan) => {
-		e.preventDefault();
+	const handleHapus = async (kodePenjualan) => {
+		// e.preventDefault();
 		const data = { kodePenjualan };
 
 		try {
@@ -244,19 +245,33 @@ const DaftarPenjualan = () => {
 
 											{status === 'admin' ? (
 												<TableCell align="center">
-													<Button
-														href={`/produk/penjualan/edit/${kodePenjualan}`}
-														variant="contained"
-														sx={{ marginRight: '0.4rem' }}
+													<Box
+														sx={{
+															display: 'flex',
+															justifyContent: 'center',
+														}}
 													>
-														Edit
-													</Button>
-													<Button
+														<Button
+															href={`/produk/penjualan/edit/${kodePenjualan}`}
+															variant="contained"
+															size="small"
+															sx={{ marginRight: '0.4rem' }}
+														>
+															Edit
+														</Button>
+
+														{/* <Button
 														variant="contained"
 														onClick={(e) => handleHapus(e, kodePenjualan)}
 													>
 														Hapus
-													</Button>
+													</Button> */}
+
+														<DeleteConfirmation
+															nama={`Penjualan Tahun ${tahun} Bulan ${bulan}`}
+															onDelete={() => handleHapus(kodePenjualan)}
+														/>
+													</Box>
 												</TableCell>
 											) : null}
 										</TableRow>
